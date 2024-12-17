@@ -33,5 +33,5 @@ Brailify is a project that converts voice input into a refreshable Braille displ
 
 1. **Clone the Repository**:
    ```sh
-   git clone https://github.com/yourusername/brailify.git
+   git clone https://github.com/albinsphilip/brailify.git
    cd brailify
