@@ -46,7 +46,7 @@ def preview_message():
     if current_index > 0:
         message = data[f'{current_index}']
         message=f'{current_index} '+message[:min(len(message),6)]+".."
-        message = re.sub(r'(\b\d+)', r'*\1', message)
+        message = re.sub(r'(\b\d+)', r'*\1*', message)
         print(f"Previewing Message at Index {current_index}: {message}")  # Preview the first 10 chars
         show_message(preview=message)
     else:
