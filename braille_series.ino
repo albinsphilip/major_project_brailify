@@ -77,8 +77,13 @@ int mapCharToSegment(char c) {
   }// Comma -> segment 29
     else if (c== ';'){
       return 0;
-  } else {
-    return -1;          // Invalid character
+  } else if (c== '#'){
+      return -1;
+  }else if (c== '*'){
+      return 31;
+  }
+  else {
+    return -2;          // Invalid character
   }
 }
 
@@ -92,7 +97,7 @@ void moveSteppers() {
 
     int segmentNumber = mapCharToSegment(c);
 
-    if (segmentNumber == -1) {
+    if (segmentNumber == -2) {
       Serial.print("Stepper ");
       Serial.print(i + 1);
       Serial.println(": Invalid character");
