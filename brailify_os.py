@@ -45,12 +45,15 @@ def save_data():
 def preview_message():
     if current_index > 0:
         message = data[f'{current_index}']
-        message=message[:min(len(message),6)]+".."
+        message=f'{current_index} '+message[:min(len(message),6)]+".."
+        message = re.sub(r'(\b\d+)', r'*\1', message)
         print(f"Previewing Message at Index {current_index}: {message}")  # Preview the first 10 chars
         show_message(preview=message)
     else:
         print("No messages available to preview.")
 
+
+    
 # Show full message from the current index
 def show_message(index=0, preview = ""):
     if current_index > 0:
@@ -58,7 +61,9 @@ def show_message(index=0, preview = ""):
         if preview!="":
             message = preview
         else:
-            message = data[f'{index if index != 0 else current_index}']
+            
+            message ="#"+ data[f'{index if index != 0 else current_index}']
+            message = re.sub(r'(\b\d+)', r'*\1', message)
             print(f"Showing Message at Index {index if index != 0 else current_index}: {message}")
 
         # Initialize buffer and other variables
@@ -172,7 +177,6 @@ while True:
 
     elif command == "show":
         show_message()
-
     elif command == "exit":
         print("Exiting program...")
         break
