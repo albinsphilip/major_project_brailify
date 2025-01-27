@@ -43,33 +43,33 @@ def save_data():
 
 # Display the transcription from the current index
 def preview_message():
-    if current_index > 0:
+    if current_index > 0 and data:
         message = data[f'{current_index}']
         message=f'{current_index} '+message[:min(len(message),6)]+".."
         message = re.sub(r'(\b\d+)', r'*\1*', message)
         print(f"Previewing Message at Index {current_index}: {message}")  # Preview the first 10 chars
         show_message(preview=message)
     else:
-        print("No messages available to preview.")
+        show_message()
 
 
     
 # Show full message from the current index
-def show_message(index=0, preview = ""):
-    if current_index > 0:
+def show_message(index=0, preview="", delete=""):
+    if current_index > 0 and data:  # Ensure there are messages to display
         # Retrieve the message
-        if preview!="":
+        if preview != "":
             message = preview
+        elif delete != "":
+            message = delete
         else:
-            
-            message ="#"+ data[f'{index if index != 0 else current_index}']
-            message = re.sub(r'(\b\d+)', r'*\1', message)
+            message = "#" + data[f'{index if index != 0 else current_index}']
+            message = re.sub(r'(\b\d+)', r'*\1*', message)
             print(f"Showing Message at Index {index if index != 0 else current_index}: {message}")
 
         # Initialize buffer and other variables
         step = 4  # Number of characters to process at a time
         buffer_index = 0  # Start from the beginning
-        displayed_segments = []  # Store each segment displayed
 
         # Start the interaction loop
         while True:
@@ -87,7 +87,7 @@ def show_message(index=0, preview = ""):
                 ser.write(char.encode())
                 ser.flush()
                 time.sleep(0.2)
-            
+
             ser.write('\n'.encode())
             ser.flush()
             print(f"Flushed: {current_segment}")
@@ -114,7 +114,41 @@ def show_message(index=0, preview = ""):
             else:
                 print("Invalid input. Please enter 'next', 'prev', or 'exit'.")
     else:
+        # When no messages are available
+        message = "no messages available."
         print("No messages available to display.")
+
+        # Start the interaction loop even if there is no actual message
+        while True:
+            # Flush the "No messages" content (padded to 4 chars) to the device
+            current_segment = message[:4]
+            if len(current_segment) < 4:
+                current_segment += ";" * (4 - len(current_segment))
+
+            for char in current_segment:
+                ser.write(char.encode())
+                ser.flush()
+                time.sleep(0.2)
+
+            ser.write('\n'.encode())
+            ser.flush()
+            print(f"Flushed: {current_segment}")
+
+            # Prompt user for the next action
+            direction = input("Enter 'next' to show next 4 characters, 'prev' to show previous 4 characters, or 'exit' to stop: ").strip().lower()
+
+            if direction == 'next':
+                print("No messages available to navigate.")
+            
+            elif direction == 'prev':
+                print("No messages available to navigate.")
+                
+            elif direction == 'exit':
+                print("Exiting message view.")
+                break
+            
+            else:
+                print("Invalid input. Please enter 'next', 'prev', or 'exit'.")
 
 
 # Record new audio and save transcription
@@ -151,9 +185,61 @@ def record_and_save():
         print("Sending transcription to Arduino...")
         show_message(index= next_index)
 
+def delete():
+    global current_index, data
+    if current_index > 0 and data:
+        # Get the current message
+        message = data.get(f'{current_index}', None)
+        if not message:
+            print("No message found at the current index.")
+            return
+        
+        # Prepare preview with limited characters
+        preview_message = f'd{current_index} ' + message[:min(len(message), 6)] + ".."
+        preview_message = re.sub(r'(\b\d+)', r'*\1*', preview_message)  # Highlight index number
+        show_message(delete=preview_message)
+        
+        # Ask for confirmation
+        inp = input(f"Are you sure you want to delete Message at Index {current_index}: '{preview_message}'? Type 'yes' to proceed or 'no' to cancel: ").strip().lower()
+        delete_message= f'd{current_index} ' + "deleted"
+        
+        if inp == "yes":
+            # Perform deletion
+            print(f"Message at Index {current_index} deleted.")
+            show_message(delete=delete_message)
+
+            # Delete the current index
+            del data[f'{current_index}']
+
+            if not data:  # If no keys exist after deletion
+                print("No more messages left.")
+                current_index = 0  # Reset the current index
+                with open('data.json', 'w') as file:
+                    json.dump(data, file, indent=4)
+                return  # Exit the function
+
+            # Renumber remaining keys if keys exist
+            updated_data = {}
+            new_index = 1
+            for old_index in sorted(int(k) for k in data.keys()):  # Iterate over sorted numeric keys
+                updated_data[str(new_index)] = data.pop(str(old_index))
+                new_index += 1
+            data = updated_data  # Assign the updated data back to the original variable
+
+            # Update current_index to point to the previous valid index
+            current_index = min(current_index - 1, len(data))
+
+            # Update the JSON file (if persisting data)
+            with open('data.json', 'w') as file:
+                json.dump(data, file, indent=4)
+
+            print("Data updated successfully.")
+
+    else:
+        show_message()
 # Main loop to prompt user for actions
 while True:
-    command = input("\nEnter a command [record, up, down, preview, show, exit]: ").strip().lower()
+    command = input("\nEnter a command [record, up, down, preview, show,delete, exit]: ").strip().lower()
 
     if command == "record":
         record_and_save()
@@ -174,6 +260,9 @@ while True:
 
     elif command == "preview":
         preview_message()
+    
+    elif command == "delete":
+        delete()
 
     elif command == "show":
         show_message()
