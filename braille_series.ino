@@ -78,8 +78,11 @@ int mapCharToSegment(char c) {
     else if (c== ';'){
       return 0;
   } else if (c== '#'){
-      return -1;
-  }else if (c== '*'){
+      return 31;
+  }else if (c >= '0' && c <= '9') {
+        return c - '0' + 1; // Map digits '0'-'9' 
+    }
+  else if (c== '*'){
       return 31;
   }
   else {
