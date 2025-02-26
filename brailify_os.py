@@ -125,7 +125,7 @@ def preview_message():
 def show_message(index=0, preview="", delete="",telegram=""):
     activate_vibration(0.5)
     global show_value
-    if current_index > 0 and data:  # Ensure there are messages to display
+    if current_index > 0 and data or delete or telegram:  # Ensure there are messages to display
         # Retrieve the message
         if preview != "":
             message = preview
@@ -218,7 +218,7 @@ def show_message(index=0, preview="", delete="",telegram=""):
                 print("Invalid input. Please enter 'next', 'prev', or 'exit'.")
     else:
         # When no messages are available
-        message = "no messages available."
+        message = "nomsg"
         print("No messages available to display.")
 
         # Start the interaction loop even if there is no actual message
@@ -232,16 +232,19 @@ def show_message(index=0, preview="", delete="",telegram=""):
             r=''
             msg=current_segment
             save_positions(msg)
+            
             for i,j in zip(msg,load):
                 r+=order[order.index(i)-order.index(j)]
-
+            
             for char in r:
                 ser.write(char.encode())
                 ser.flush()
                 time.sleep(0.2)
-
             ser.write('\n'.encode())
             ser.flush()
+            ser.reset_input_buffer()
+            ser.reset_output_buffer()
+            
             print(f"Flushed: {current_segment}")
 
             try:
@@ -261,11 +264,11 @@ def show_message(index=0, preview="", delete="",telegram=""):
             except:
                 print("Cannot read")
             if prev_y==-1:
-                activate_buzzer(0.1)
+                
                 print("No messages available to navigate.")
             
             elif prev_y==1:
-                activate_buzzer(0.1)
+               
                 print("No messages available to navigate.")
                 
             elif GPIO.input(BUTTON_BACK) == GPIO.LOW:
@@ -544,7 +547,6 @@ async def navigate_chats():
             return
         else:
             print("Invalid input. Please try again.")
-            break
 
 
 async def show_messages_in_chat(chat_name, chat_messages):
@@ -726,13 +728,8 @@ try:
                     break  # Exit loop if any button changed
                 time.sleep(0.01)
         except:
-            print("Cannot read serial data")
-            
-            
-     
-       
-        # Check buttons manually (Polling)
-        if current_record_state == GPIO.LOW and prev_record_state == GPIO.HIGH:
+   
+             current_record_state == GPIO.LOW and prev_record_state == GPIO.HIGH:
             activate_buzzer(0.1)
             record_and_save()  # Call function when button is pressed
             time.sleep(0.02)  # Small delay to prevent CPU overuse
