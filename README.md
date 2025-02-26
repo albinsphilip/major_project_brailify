@@ -29,7 +29,13 @@ Brailify is a project that converts voice input into a refreshable Braille displ
   - **Joystick Control**:  
     - Allows users to navigate through transcriptions using the PS2 joystick module.  
 
-
+## **Running script in background**
+- **Using systemd manager** : create active.service file and add configuration about active.py script running in background.
+```sh
+sudo systemctl daemon-reload
+sudo systemctl start active.service
+sudo systemctl status active.service
+```
 ## **Setup and Installation**  
 
 ### **1. Clone the Repository**  
