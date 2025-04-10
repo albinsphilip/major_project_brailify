@@ -1,4 +1,4 @@
-# ![Brailify Banner](brailify_banner.png)  
+# ![Brailify Banner](brailify.jpg)  
 # **Brailify: Voice to Refreshable Braille Display**
 
 ## **Project Overview**  
