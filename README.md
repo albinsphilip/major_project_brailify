@@ -1,4 +1,7 @@
-# ![Brailify Banner](brailify.jpg)  
+<p align="center">
+  <img src="brailify.jpg" width="500">
+</p>
+ 
 # **Brailify: Voice to Refreshable Braille Display**
 
 ## **Project Overview**  
