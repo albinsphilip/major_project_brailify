@@ -1,3 +1,4 @@
+# ![Brailify Banner](brailify_banner.png)  
 # **Brailify: Voice to Refreshable Braille Display**
 
 ## **Project Overview**  
@@ -7,8 +8,8 @@ Brailify is a project that converts voice input into a refreshable Braille displ
 
 ### **Files**
 
-### **1. `brailify_os.py`**  
-- **Description**: This script acts as the operating system for Brailify, handling all major functionalities, including:  
+### **1. `brailify_firmware.py`**  
+- **Description**: This script acts as the firmware for Brailify, handling all major functionalities, including:  
   - **File Application**:  
     - Recording and saving transcriptions.  
     - Deleting files.  
@@ -30,15 +31,8 @@ Brailify is a project that converts voice input into a refreshable Braille displ
     - Allows users to navigate through transcriptions using the PS2 joystick module.  
 
 ## **Running script in background**
-- **Using systemd manager** : create active.service file and add configuration about active.py script running in background.
+- **Using systemd manager** : create `active.service` file and add configuration for running the `active.py` script in the background.
 ```sh
 sudo systemctl daemon-reload
 sudo systemctl start active.service
 sudo systemctl status active.service
-```
-## **Setup and Installation**  
-
-### **1. Clone the Repository**  
-```sh
-git clone https://github.com/albinsphilip/brailify.git
-cd brailify
